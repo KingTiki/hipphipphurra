@@ -1,0 +1,36 @@
+# Runtime data and local configuration
+.env
+.env.*
+!.env.example
+data/
+backups/
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+*.bak
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Dependencies, caches and test output
+node_modules/
+.cache/
+coverage/
+*.log
+
+# Local design exports and development tools
+designs/
+.agents/
+.codex/
+.aws/
+.idea/
+.vscode/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini

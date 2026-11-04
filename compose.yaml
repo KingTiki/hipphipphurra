@@ -1,0 +1,12 @@
+services:
+  kuchenzeit:
+    image: ${IMAGE:?Set IMAGE in .env to ghcr.io/owner/repository:latest}
+    restart: unless-stopped
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${HTTP_PORT:-3000}:3000"
+    environment:
+      BASE_URL: ${BASE_URL:-http://localhost:3000}
+      TEAMS_WEBHOOK_URL: ${TEAMS_WEBHOOK_URL:-}
+    volumes:
+      - ./data:/data
+    stop_grace_period: 2m

@@ -1,0 +1,26 @@
+{
+  "name": "hipphipphurra",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Das kleine Geburtstagsverzeichnis fürs Team – ohne Frameworks.",
+  "engines": {
+    "node": ">=24.15 <25"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test --test-concurrency=1",
+    "check:repo": "node scripts/check-repo.mjs"
+  },
+  "license": "MIT",
+  "author": "Marcel Hermann",
+  "keywords": [
+    "birthdays",
+    "calendar",
+    "icalendar",
+    "teams",
+    "docker",
+    "sqlite"
+  ]
+}

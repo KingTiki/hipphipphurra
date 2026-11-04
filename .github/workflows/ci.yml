@@ -1,0 +1,127 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Node.js 24 / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+      - name: Verify lockfile
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Check repository files and license notices
+        run: npm run check:repo
+      - name: Tests
+        run: npm test
+
+  docker:
+    name: Docker build and restart test
+    needs: test
+    if: github.event_name == 'release' && github.event.action == 'published' && github.event.release.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+      - name: Validate Compose
+        run: |
+          IMAGE=hipphipphurra:ci docker compose config --quiet
+          docker compose -f compose.build.yaml config --quiet
+      - name: Build image
+        run: docker build --platform linux/amd64 --tag hipphipphurra:ci .
+      - name: Check HTTP, calendar and data after restart
+        run: node scripts/docker-smoke.mjs hipphipphurra:ci
+
+  publish:
+    name: Publish tested image to GHCR
+    needs: docker
+    if: github.event_name == 'release' && github.event.action == 'published' && github.event.release.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+      - name: Determine image name and tags
+        id: image
+        run: node scripts/image-tags.mjs
+      - name: Build release image
+        env:
+          RELEASE_TAG: ${{ steps.image.outputs.tag }}
+        run: |
+          docker build --platform linux/amd64 --tag hipphipphurra:publish \
+            --label "org.opencontainers.image.source=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
+            --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+            --label "org.opencontainers.image.version=$RELEASE_TAG" .
+      - name: Test the exact release image before publishing
+        run: node scripts/docker-smoke.mjs hipphipphurra:publish
+      - name: Log in to GHCR
+        id: login
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          export DOCKER_CONFIG="$RUNNER_TEMP/ghcr-docker"
+          mkdir -p "$DOCKER_CONFIG"
+          printf 'DOCKER_CONFIG=%s\n' "$DOCKER_CONFIG" >> "$GITHUB_ENV"
+          printf '%s' "$GHCR_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+      - name: Push image tags
+        env:
+          IMAGE: ${{ steps.image.outputs.image }}
+          RELEASE_TAG: ${{ steps.image.outputs.tag }}
+          SHA_TAG: ${{ steps.image.outputs.sha_tag }}
+          PUBLISH_LATEST: ${{ steps.image.outputs.latest }}
+        run: |
+          docker tag hipphipphurra:publish "$IMAGE:$SHA_TAG"
+          docker tag hipphipphurra:publish "$IMAGE:$RELEASE_TAG"
+          docker push "$IMAGE:$SHA_TAG"
+          docker push "$IMAGE:$RELEASE_TAG"
+          printf '### Published container images\n\n- %s:%s\n- %s:%s\n' \
+            "$IMAGE" "$RELEASE_TAG" "$IMAGE" "$SHA_TAG" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$PUBLISH_LATEST" = "true" ]; then
+            docker tag hipphipphurra:publish "$IMAGE:latest"
+            docker push "$IMAGE:latest"
+            printf '\n- %s:latest\n' "$IMAGE" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Log out of GHCR
+        if: ${{ always() && steps.login.outcome == 'success' }}
+        run: docker logout ghcr.io
