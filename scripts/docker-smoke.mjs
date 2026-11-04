@@ -21,7 +21,7 @@ try {
       catch { /* Startup may take a moment. */ }
       await delay(250);
     }
-    throw new Error(`Container wurde nicht bereit. Logs: ${docker(['logs', container])}`);
+    throw new Error(`Container did not become ready. Logs: ${docker(['logs', container])}`);
   }
   await ready();
   assert.deepEqual(await (await fetch(`${base}/api/employees`)).json(), []);
@@ -34,7 +34,10 @@ try {
   const people = await (await fetch(`${base}/api/employees`)).json();
   assert.equal(people.length, 1); assert.equal(people[0].id, person.id);
   assert.match(await (await fetch(`${base}/calendar.ics`)).text(), /Docker Test/);
-  assert.match(await (await fetch(base)).text(), /Geburtstage in der Abteilung/);
+  assert.match(await (await fetch(base)).text(), /Team birthdays/);
+  assert.equal((await fetch(`${base}/i18n.js`)).status, 200);
+  assert.match(await (await fetch(`${base}/calendar.ics?lang=de`)).text(), /hat Geburtstag/);
+  assert.match(await (await fetch(`${base}/calendar.ics?lang=en`)).text(), /birthday/);
   assert.equal(docker(['exec', container, 'id', '-u']), '1000');
   assert.match(docker(['exec', container, 'cat', '/app/LICENSE']), /MIT License/);
   assert.match(docker(['exec', container, 'cat', '/app/THIRD_PARTY_NOTICES.md']), /SIL Open Font License/);
@@ -42,7 +45,7 @@ try {
     const response = await fetch(`${base}/fonts/${font}-OFL.txt`);
     assert.equal(response.status, 200); assert.match(await response.text(), /SIL OPEN FONT LICENSE Version 1.1/);
   }
-  console.log('Docker-Smoke-Test erfolgreich: HTTP, CRUD, Kalender, Lizenzen, Nicht-Root-Betrieb und Daten nach Container-Neustart.');
+  console.log('Docker smoke test passed: HTTP, CRUD, localized calendars, licenses, non-root execution and persistent data after restart.');
 } finally {
   if (containerCreated) docker(['rm', '-f', container]);
   if (volumeCreated) docker(['volume', 'rm', volume]);

@@ -7,7 +7,7 @@ export function openDatabase(path = ':memory:') {
   if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true });
   const db = new DatabaseSync(path);
   const version = db.prepare('PRAGMA user_version').get().user_version;
-  if (version > 2) { db.close(); throw new Error('Die Datenbank benötigt eine neuere Anwendungsversion.'); }
+  if (version > 2) { db.close(); throw new Error('The database requires a newer application version.'); }
   db.exec(`
     PRAGMA journal_mode = WAL;
     PRAGMA busy_timeout = 5000;

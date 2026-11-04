@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Das kleine Geburtstagsverzeichnis fürs Team – ohne Frameworks.",
+  "description": "A small bilingual birthday directory for your team, without frameworks.",
   "engines": {
     "node": ">=24.15 <25"
   },

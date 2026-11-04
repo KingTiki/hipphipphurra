@@ -1,3 +1,5 @@
+import { translate } from '../public/i18n.js';
+
 export const TIME_ZONE = 'Europe/Berlin';
 
 export function berlinDate(now = new Date()) {
@@ -35,27 +37,30 @@ export function describeBirthday(person, today = berlinDate()) {
 }
 
 export class InputError extends Error {
-  constructor(message, status = 400) { super(message); this.status = status; }
+  constructor(code, status = 400, params = {}) {
+    super(translate('en', `error.${code}`, params));
+    this.code = code; this.status = status; this.params = params;
+  }
 }
 
 export function validatePerson(input, today = berlinDate()) {
-  if (!input || typeof input !== 'object' || Array.isArray(input)) throw new InputError('Bitte prüfe die Eingaben.');
+  if (!input || typeof input !== 'object' || Array.isArray(input)) throw new InputError('invalidInput');
   const name = typeof input.name === 'string' ? input.name.trim().replace(/\s+/g, ' ') : '';
   const { day, month } = input;
   const year = input.year === '' || input.year === undefined || input.year === null ? null : input.year;
-  if (!name || name.length > 120) throw new InputError('Bitte einen Namen mit höchstens 120 Zeichen eingeben.');
+  if (!name || name.length > 120) throw new InputError('invalidName');
   if (!Number.isInteger(month) || month < 1 || month > 12 || !Number.isInteger(day) || day < 1) {
-    throw new InputError('Bitte einen gültigen Geburtstag eingeben.');
+    throw new InputError('invalidBirthday');
   }
   if (year !== null && (!Number.isInteger(year) || year < 1900 || year > today.year)) {
-    throw new InputError(`Das Geburtsjahr muss zwischen 1900 und ${today.year} liegen.`);
+    throw new InputError('invalidYear', 400, { year: today.year });
   }
   const referenceYear = year ?? 2000;
   const candidate = new Date(Date.UTC(referenceYear, month - 1, day));
   if (candidate.getUTCMonth() !== month - 1 || candidate.getUTCDate() !== day) {
-    throw new InputError('Diesen Tag gibt es im gewählten Monat nicht.');
+    throw new InputError('invalidDay');
   }
-  if (year !== null && stamp({ year, month, day }) > stamp(today)) throw new InputError('Der Geburtstag darf nicht in der Zukunft liegen.');
+  if (year !== null && stamp({ year, month, day }) > stamp(today)) throw new InputError('futureBirthday');
   return { name, day, month, year };
 }
 

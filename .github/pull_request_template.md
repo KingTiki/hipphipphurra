@@ -1,7 +1,7 @@
-## Änderung
+## Change
 
-Was ändert sich und warum?
+What changes and why?
 
-## Prüfung
+## Validation
 
-Welche Tests oder manuellen Prüfungen wurden ausgeführt?
+Which tests or manual checks were performed?

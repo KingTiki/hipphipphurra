@@ -62,7 +62,7 @@ test('public config exposes calendar and Teams availability without credentials'
 });
 test('static page, scripts, styles, calendar and health are served with suitable types', async t => {
   const { request } = await start(t);
-  for (const [path, type] of [['/', 'text/html'], ['/style.css', 'text/css'], ['/app.js', 'text/javascript'], ['/view-model.js', 'text/javascript'], ['/favicon.svg', 'image/svg+xml'], ['/cake.svg', 'image/svg+xml'], ['/bunting.svg', 'image/svg+xml'], ['/confetti.svg', 'image/svg+xml'], ['/calendar.ics', 'text/calendar']]) {
+  for (const [path, type] of [['/', 'text/html'], ['/style.css', 'text/css'], ['/app.js', 'text/javascript'], ['/i18n.js', 'text/javascript'], ['/view-model.js', 'text/javascript'], ['/favicon.svg', 'image/svg+xml'], ['/cake.svg', 'image/svg+xml'], ['/bunting.svg', 'image/svg+xml'], ['/confetti.svg', 'image/svg+xml'], ['/calendar.ics', 'text/calendar']]) {
     const response = await request(path); assert.equal(response.status, 200); assert.ok(response.headers.get('content-type').startsWith(type));
     assert.ok(response.headers.get('content-security-policy')); await response.text();
   }
@@ -75,6 +75,36 @@ test('static page, scripts, styles, calendar and health are served with suitable
     assert.equal(Buffer.from(await response.arrayBuffer()).subarray(0, 4).toString(), 'wOF2');
   }
 });
+test('API validation errors follow the requested language and include stable error codes', async t => {
+  const { request } = await start(t);
+  for (const [language, expected] of [['en', 'Please enter a name with no more than 120 characters.'],
+    ['de-CH,en;q=0.8', 'Bitte einen Namen mit höchstens 120 Zeichen eingeben.']]) {
+    const response = await request('/api/employees', 'POST', { ...payload, name: '' }, { 'Accept-Language': language });
+    assert.equal(response.status, 400); assert.equal(response.headers.get('vary'), 'Accept-Language');
+    assert.deepEqual(await response.json(), { error: expected, code: 'invalidName', params: {} });
+  }
+  const response = await request('/api/employees', 'POST', { ...payload, year: 1800 }, { 'Accept-Language': 'de' });
+  const error = await response.json();
+  assert.equal(error.code, 'invalidYear'); assert.deepEqual(error.params, { year: 2026 });
+  assert.match(error.error, /1900 und 2026/);
+  assert.equal((await (await request('/missing', 'GET', undefined, { 'Accept-Language': 'de' })).json()).error,
+    'Hier gibt es leider nichts zu finden.');
+});
+
+test('calendar language is fixed by the subscription URL and also works for HEAD requests', async t => {
+  const { request } = await start(t);
+  await request('/api/employees', 'POST', payload);
+  const german = await request('/calendar.ics?lang=de', 'GET', undefined, { 'Accept-Language': 'en' });
+  assert.equal(german.headers.get('content-language'), 'de');
+  assert.match(await german.text(), /hat Geburtstag/);
+  const english = await request('/calendar.ics?lang=en', 'GET', undefined, { 'Accept-Language': 'de' });
+  assert.equal(english.headers.get('content-language'), 'en'); assert.match(await english.text(), /birthday/);
+  const negotiated = await request('/calendar.ics', 'GET', undefined, { 'Accept-Language': 'fr,de;q=0.8' });
+  assert.equal(negotiated.headers.get('content-language'), 'de');
+  const head = await request('/calendar.ics?lang=de', 'HEAD');
+  assert.equal(head.status, 200); assert.equal(head.headers.get('content-language'), 'de'); assert.equal(await head.text(), '');
+});
+
 test('SQLite preserves people and Teams delivery status when reopened', () => {
   const dir = mkdtempSync(join(tmpdir(), 'kuchenzeit-test-'));
   const path = join(dir, 'data.sqlite'); let db;

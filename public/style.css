@@ -64,6 +64,8 @@ svg, img { display: block; }
 .site-header nav a { padding-bottom: 4px; color: var(--muted); border-bottom: 2px solid transparent; }
 .site-header nav .nav-active { color: var(--ink); border-bottom-color: var(--yellow); }
 .header-subscribe { margin-left: auto; }
+.header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex-wrap: wrap; margin-left: auto; }
+.language-control select { max-width: 170px; min-height: 44px; padding: 8px 26px 8px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); font-size: 13px; }
 .button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid transparent; border-radius: 999px; padding: 12px 20px; min-height: 44px; font-size: 14px; line-height: 20px; font-weight: 600; white-space: nowrap; transition: background .16s, border-color .16s; }
 .button .icon { width: 17px; height: 17px; }
 .button-dark { color: white; background: var(--ink); }
@@ -170,6 +172,7 @@ svg, img { display: block; }
 .field input, .field select { width: 100%; border: 1px solid #d9d3c4; border-radius: 12px; padding: 11px 12px; min-height: 46px; background: white; color: var(--ink); font-size: 16px; }
 .field input::placeholder { color: #777b72; }
 .field > span { font-size: 12px; font-weight: 400; color: var(--muted); display: contents; }
+.field > span[data-i18n]:not([data-i18n="optional"]) { font: inherit; color: inherit; }
 .date-fields { display: grid; grid-template-columns: 80px minmax(0, 1fr) 110px; gap: 12px; }
 .date-fields .field { display: block; }
 .date-fields input, .date-fields select { margin-top: 8px; }
@@ -247,6 +250,7 @@ svg, img { display: block; }
 }
 
 @media (max-width: 560px) {
+  .header-actions { width: 100%; justify-content: space-between; }
   .site-header { flex-wrap: wrap; gap: 16px; padding: 20px; }
   .brand { font-size: 20px; gap: 8px; }
   .brand-cake { width: 36px; height: 36px; }

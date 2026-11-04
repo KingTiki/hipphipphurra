@@ -1,62 +1,61 @@
 # Hipphipphurra
 
-## Kurzbeschreibung
+Manage team birthdays, subscribe to a calendar feed, and receive reminders through
+a Teams webhook. Built for internal use, without user accounts. Available in English
+and German, with automatic browser language detection.
 
-Geburtstage der Abteilung verwalten, als Kalender abonnieren und per Teams-Webhook
-erinnern lassen. Ohne Anmeldung, für den internen Einsatz.
+![English interface with fictional team birthdays](docs/images/screenshot-en.png)
 
-## Docker-Compose-Setup
+## Docker Compose setup
 
-[compose.yaml](compose.yaml) und [.env.example](.env.example) herunterladen.
-Die Beispieldatei als `.env` speichern und die Image-Adresse anpassen:
+Download [compose.yaml](compose.yaml) and [.env.example](.env.example).
+Save the example as `.env` and set the image address:
 
 ```dotenv
-IMAGE=ghcr.io/dein-account/dein-repository:latest
+IMAGE=ghcr.io/your-account/your-repository:latest
 BASE_URL=http://localhost:3000
 TEAMS_WEBHOOK_URL=
+TEAMS_LANGUAGE=de
 ```
 
-Konto und Repository kleinschreiben. `latest` folgt dem zuletzt veröffentlichten
-stabilen Release. `TEAMS_WEBHOOK_URL` ist optional.
+Use lowercase account and repository names. `latest` follows the most recently
+published stable release. `TEAMS_WEBHOOK_URL` is optional.
 
-Unter Linux vor dem ersten Start:
+On Linux, prepare the data directory before the first start:
 
 ```sh
 mkdir -p data
 sudo chown 1000:1000 data
 ```
 
-Starten:
+Start the application:
 
 ```sh
 docker compose up -d
 ```
 
-Aufrufen unter **http://localhost:3000**. Die Daten liegen dauerhaft in `./data`.
-Für Zugriff im internen Netz `BIND_ADDRESS=0.0.0.0` und die erreichbare
-Serveradresse als `BASE_URL` setzen. Das fertige Image unterstützt Linux/amd64.
+Open **http://localhost:3000**. Data is stored persistently in `./data`.
+For access from your internal network, set `BIND_ADDRESS=0.0.0.0` and set
+`BASE_URL` to the reachable server address. The published image supports Linux/amd64.
 
-## Sicherer Betrieb
+## Secure operation
 
-Alle Personen mit Zugriff auf die Anwendung können sämtliche Einträge lesen,
-ändern und löschen. Den Zugriff über Netzwerkregeln oder eine vorgeschaltete
-Anmeldung auf den vorgesehenen Personenkreis begrenzen. Für HTTPS einen Reverse
-Proxy verwenden.
+Anyone who can access the application can read, edit, and delete all entries.
+Restrict access to the intended users through network rules or an authentication
+proxy. Use a reverse proxy for HTTPS.
 
-Die Teams-Webhook-URL vertraulich in `.env` oder der Deployment-Konfiguration
-speichern. Wurde sie offengelegt, die URL im Teams-Workflow ersetzen und die
-Konfiguration aktualisieren. Das Löschen aus einer Datei entfernt sie nicht aus
-bereits veröffentlichten Git-Commits.
+Keep the Teams webhook URL secret in `.env` or your deployment configuration.
+If it is exposed, replace the URL in the Teams workflow and update the
+configuration. Deleting it from a file does not remove it from published Git commits.
 
-Echte Mitarbeiterdaten, den Datenordner und Sicherungen nicht ins Repository
-hochladen. Hinweise zu Updates und Datensicherung stehen in
-[CONTRIBUTING.md](CONTRIBUTING.md#updates-und-sicherung), Versionssupport und
-Meldeweg für Sicherheitslücken in [SECURITY.md](SECURITY.md).
+Do not upload real employee data, the data directory, or backups to the repository.
+See [CONTRIBUTING.md](CONTRIBUTING.md#updates-and-backups) for updates and backups,
+and [SECURITY.md](SECURITY.md) for supported versions and vulnerability reporting.
 
-## Lizenzen
+## Licenses
 
-- Projektcode und Grafiken: [MIT](LICENSE).
-- Bricolage Grotesque und DM Sans: SIL Open Font License 1.1.
-  Herkunft und Lizenztexte: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+- Project code and graphics: [MIT](LICENSE).
+- Bricolage Grotesque and DM Sans: SIL Open Font License 1.1.
+  Sources and license texts: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-Entwicklung und Projektpflege: [CONTRIBUTING.md](CONTRIBUTING.md).
+Development and project maintenance: [CONTRIBUTING.md](CONTRIBUTING.md).

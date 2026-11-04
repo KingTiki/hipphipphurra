@@ -8,11 +8,14 @@ import { berlinDate, describeBirthday, InputError, validatePerson } from './birt
 import { createCalendar } from './calendar.js';
 import { createNotifier } from './notifications.js';
 import { createTransports } from './transports.js';
+import { requestLanguage } from './language.js';
+import { translate } from '../public/i18n.js';
 
 const publicDir = fileURLToPath(new URL('../public/', import.meta.url));
 const assets = { '/': ['index.html', 'text/html; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'], '/style.css': ['style.css', 'text/css; charset=utf-8'],
   '/view-model.js': ['view-model.js', 'text/javascript; charset=utf-8'],
+  '/i18n.js': ['i18n.js', 'text/javascript; charset=utf-8'],
   '/cake.svg': ['cake.svg', 'image/svg+xml'], '/bunting.svg': ['bunting.svg', 'image/svg+xml'],
   '/confetti.svg': ['confetti.svg', 'image/svg+xml'],
   '/fonts/bricolage-grotesque-latin.woff2': ['fonts/bricolage-grotesque-latin.woff2', 'font/woff2'],
@@ -22,14 +25,14 @@ const assets = { '/': ['index.html', 'text/html; charset=utf-8'],
   '/favicon.svg': ['favicon.svg', 'image/svg+xml'] };
 
 async function readJson(req) {
-  if (!req.headers['content-type']?.startsWith('application/json')) throw new InputError('JSON erwartet.', 415);
+  if (!req.headers['content-type']?.startsWith('application/json')) throw new InputError('jsonExpected', 415);
   const chunks = []; let length = 0;
   for await (const chunk of req) {
     length += chunk.length;
-    if (length > 16384) throw new InputError('Die Anfrage ist zu groß.', 413);
+    if (length > 16384) throw new InputError('tooLarge', 413);
     chunks.push(chunk);
   }
-  try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { throw new InputError('Die Anfrage enthält ungültiges JSON.'); }
+  try { return JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { throw new InputError('invalidJson'); }
 }
 
 export function createApplication({ config = loadConfig(), db = openDatabase(config.dbPath), logger = console,
@@ -39,6 +42,8 @@ export function createApplication({ config = loadConfig(), db = openDatabase(con
     res.end(JSON.stringify(value));
   };
   const server = createServer(async (req, res) => {
+    let language = requestLanguage(req.headers['accept-language']);
+    res.setHeader('Vary', 'Accept-Language');
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'same-origin');
     res.setHeader('X-Frame-Options', 'DENY');
@@ -46,13 +51,14 @@ export function createApplication({ config = loadConfig(), db = openDatabase(con
     try {
       const url = new URL(req.url, config.baseUrl);
       const { pathname } = url;
+      if (pathname === '/calendar.ics') language = requestLanguage(req.headers['accept-language'], url.searchParams.get('lang'));
       if (!['GET', 'HEAD'].includes(req.method)) {
-        if (req.headers['x-kuchenzeit'] !== '1') throw new InputError('Ungültige Anfrage.', 403);
+        if (req.headers['x-kuchenzeit'] !== '1') throw new InputError('invalidRequest', 403);
         const origin = req.headers.origin;
         const localOrigin = `http://${req.headers.host}`;
         const secureOrigin = `https://${req.headers.host}`;
         if (origin && ![new URL(config.baseUrl).origin, localOrigin, secureOrigin].includes(origin)) {
-          throw new InputError('Diese Anfrage ist nicht erlaubt.', 403);
+          throw new InputError('forbidden', 403);
         }
       }
       if (req.method === 'GET' && pathname === '/health') {
@@ -66,7 +72,7 @@ export function createApplication({ config = loadConfig(), db = openDatabase(con
       if (req.method === 'GET' && pathname === '/api/employees') {
         const today = berlinDate(clock());
         return json(res, 200, db.listPeople().map(person => describeBirthday(person, today))
-          .sort((a, b) => a.daysUntil - b.daysUntil || a.name.localeCompare(b.name, 'de')));
+          .sort((a, b) => a.daysUntil - b.daysUntil || a.name.localeCompare(b.name, language)));
       }
       if (req.method === 'POST' && pathname === '/api/employees') {
         const person = db.addPerson(validatePerson(await readJson(req), berlinDate(clock())));
@@ -75,15 +81,16 @@ export function createApplication({ config = loadConfig(), db = openDatabase(con
       const employee = /^\/api\/employees\/([a-f\d-]{36})$/.exec(pathname);
       if (employee && ['PUT', 'DELETE'].includes(req.method)) {
         const id = employee[1];
-        if (!db.getPerson(id)) throw new InputError('Dieser Eintrag wurde bereits gelöscht.', 404);
+        if (!db.getPerson(id)) throw new InputError('deleted', 404);
         if (req.method === 'DELETE') { db.deletePerson(id); return json(res, 200, { ok: true }); }
         const person = db.updatePerson(id, validatePerson(await readJson(req), berlinDate(clock())));
         return json(res, 200, describeBirthday(person, berlinDate(clock())));
       }
       if (['GET', 'HEAD'].includes(req.method) && pathname === '/calendar.ics') {
         res.writeHead(200, { 'Content-Type': 'text/calendar; charset=utf-8', 'Cache-Control': 'no-cache',
+          'Content-Language': language,
           'Content-Disposition': 'inline; filename="hipphipphurra.ics"' });
-        return res.end(req.method === 'HEAD' ? undefined : createCalendar(db.listPeople()));
+        return res.end(req.method === 'HEAD' ? undefined : createCalendar(db.listPeople(), language));
       }
       if (['GET', 'HEAD'].includes(req.method) && assets[pathname]) {
         const [file, type] = assets[pathname];
@@ -91,11 +98,17 @@ export function createApplication({ config = loadConfig(), db = openDatabase(con
         res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-cache' });
         return res.end(req.method === 'HEAD' ? undefined : content);
       }
-      json(res, 404, { error: 'Hier gibt es leider nichts zu finden.' });
+      res.setHeader('Content-Language', language);
+      json(res, 404, { error: translate(language, 'error.notFound'), code: 'notFound' });
     } catch (error) {
       if (!(error instanceof InputError)) logger.error(JSON.stringify({ event: 'request_failed', code: error.code || 'INTERNAL_ERROR' }));
-      if (!res.headersSent) json(res, error instanceof InputError ? error.status : 500,
-        { error: error instanceof InputError ? error.message : 'Das hat leider nicht geklappt. Bitte versuche es noch einmal.' });
+      if (!res.headersSent) {
+        const inputError = error instanceof InputError;
+        const code = inputError ? error.code : 'internal';
+        const params = inputError ? error.params : {};
+        res.setHeader('Content-Language', language);
+        json(res, inputError ? error.status : 500, { error: translate(language, `error.${code}`, params), code, params });
+      }
       else res.end();
     }
   });
@@ -122,10 +135,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
     const config = loadConfig();
     const app = createApplication({ config });
     app.server.listen(config.port, config.host, () => {
-      console.info(`Hipphipphurra läuft auf ${config.baseUrl}`);
+      console.info(`Hipphipphurra is running at ${config.baseUrl}`);
       app.startScheduler();
     });
-    app.server.on('error', error => { console.error(`Serverstart fehlgeschlagen: ${error.code || 'SERVER_ERROR'}`); process.exitCode = 1; app.db.close(); });
+    app.server.on('error', error => { console.error(`Server startup failed: ${error.code || 'SERVER_ERROR'}`); process.exitCode = 1; app.db.close(); });
     let stopping = false;
     for (const signal of ['SIGTERM', 'SIGINT']) process.on(signal, async () => {
       if (stopping) return; stopping = true;

@@ -1,3 +1,5 @@
+import { translate } from '../public/i18n.js';
+
 const escape = value => value.replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n').replace(/;/g, '\\;').replace(/,/g, '\\,');
 const compact = value => value.replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
 
@@ -12,9 +14,9 @@ export function foldLine(line) {
   return result;
 }
 
-export function createCalendar(people) {
-  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Hipphipphurra//Geburtstage//DE',
-    'CALSCALE:GREGORIAN', 'X-WR-CALNAME:Hipphipphurra · Geburtstage'];
+export function createCalendar(people, language = 'en') {
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Hipphipphurra//Birthdays//EN',
+    'CALSCALE:GREGORIAN', `X-WR-CALNAME:${translate(language, 'calendarTitle')}`];
   for (const person of people) {
     const mm = String(person.month).padStart(2, '0');
     const dd = String(person.day).padStart(2, '0');
@@ -23,7 +25,7 @@ export function createCalendar(people) {
       `DTSTAMP:${compact(person.updatedAt)}`, `LAST-MODIFIED:${compact(person.updatedAt)}`,
       `DTSTART;VALUE=DATE:2000${mm}${dd}`, 'DURATION:P1D',
       leapDay ? 'RRULE:FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=-1' : 'RRULE:FREQ=YEARLY',
-      `SUMMARY:${escape(`🎂 ${person.name} hat Geburtstag`)}`, 'TRANSP:TRANSPARENT',
+      `SUMMARY:${escape(translate(language, 'calendarBirthday', { name: person.name }))}`, 'TRANSP:TRANSPARENT',
       'END:VEVENT');
   }
   lines.push('END:VCALENDAR');

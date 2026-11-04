@@ -1,27 +1,27 @@
-# Sicherheit
+# Security
 
-## Unterstützte Versionen
+## Supported versions
 
-Unterstützt wird das jeweils neueste stabile Release. Sicherheitskorrekturen
-werden als neues Release veröffentlicht; ältere Versionen erhalten keine
-separaten Sicherheitsupdates. Vorabversionen sind für Tests vorgesehen.
+Only the latest stable release is supported. Security fixes are published as new
+releases; older versions do not receive separate security updates. Prereleases
+are intended for testing.
 
-## Schwachstellen melden
+## Reporting a vulnerability
 
-Sicherheitslücken bitte im GitHub-Repository über **Security → Report a vulnerability**
-privat melden. Die Meldung sollte die betroffene Version, eine Beschreibung und
-Schritte zur Reproduktion mit fiktiven Daten enthalten.
+Please report vulnerabilities privately through **Security → Report a vulnerability**
+in the GitHub repository. Include the affected version, a description, and steps
+to reproduce the issue using fictional data.
 
-Falls diese Funktion im Repository nicht verfügbar ist, steht derzeit kein
-privater Meldeweg bereit. Bitte keine vertraulichen Details, Zugangsdaten oder
-personenbezogenen Daten in öffentlichen Issues veröffentlichen.
+If this feature is unavailable in the repository, no private reporting channel
+is currently provided. Do not post confidential details, credentials, or personal
+data in public issues.
 
-## Zugriffsmodell
+## Access model
 
-Hipphipphurra hat keine Anmeldung oder Rollen. Jeder, der die Anwendung erreicht,
-kann alle Mitarbeiterdaten lesen, ändern und löschen. Auch der Kalenderfeed ist
-ohne Anmeldung abrufbar. Origin- und Header-Prüfungen ersetzen keine Anmeldung.
+Hipphipphurra has no authentication or roles. Anyone who can reach the application
+can read, edit, and delete all employee data. The calendar feed is also accessible
+without authentication. Origin and header checks do not replace authentication.
 
-Den Zugriff deshalb auf den vorgesehenen Personenkreis begrenzen, etwa über
-Netzwerkregeln oder eine vorgeschaltete Anmeldung. Hinweise zum Betrieb und zum
-Umgang mit Geheimnissen stehen in der [README](README.md#sicherer-betrieb).
+Restrict access to the intended users, for example through network rules or an
+authentication proxy. See the [README](README.md#secure-operation) for deployment
+guidance and handling secrets.

@@ -58,7 +58,7 @@ test('overlapping scheduler calls share one delivery operation', async t => {
 });
 test('weekend birthdays are delivered and disabled Teams stays silent', async t => {
   const { db, clock, config, sent, build } = setup(t);
-  db.addPerson({ name: 'Samstag', day: 31, month: 10, year: null });
+  db.addPerson({ name: 'Saturday', day: 31, month: 10, year: null });
   clock.value = new Date('2026-10-31T07:00:00Z');
   const tick = build(); await tick(); assert.equal(sent.teams.length, 1);
   config.teamsWebhookUrl = ''; clock.value = new Date('2026-10-28T07:00:00Z'); await tick();

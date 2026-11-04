@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#FAF8F3">
-  <meta name="description" content="Geburtstage von Mitarbeitern verwalten und Erinnerungen abonnieren.">
-  <title>Hipphipphurra · Geburtstage in der Abteilung</title>
+  <meta name="description" content="Manage team birthdays and subscribe to reminders.">
+  <title>Hipphipphurra &#183; Team birthdays</title>
   <link rel="icon" href="/favicon.svg?v=cake" type="image/svg+xml">
   <link rel="preload" href="/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/bricolage-grotesque-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -30,58 +30,59 @@
   </defs></svg>
 
   <header class="site-header">
-    <a class="brand" href="/" aria-label="Hipphipphurra Startseite"><img class="brand-cake" src="/cake.svg" width="44" height="44" alt="" aria-hidden="true">Hipphipphurra</a>
-    <nav aria-label="Hauptnavigation"><a class="nav-active" href="#overview">Übersicht</a><a href="#birthdays">Alle Geburtstage</a></nav>
-    <button class="button button-dark header-subscribe" data-action="subscribe">Abonnieren</button>
+    <a class="brand" href="/" aria-label="Hipphipphurra home" data-i18n-aria-label="home"><img class="brand-cake" src="/cake.svg" width="44" height="44" alt="" aria-hidden="true">Hipphipphurra</a>
+    <nav aria-label="Main navigation" data-i18n-aria-label="navigation"><a class="nav-active" href="#overview" data-i18n="overview">Overview</a><a href="#birthdays" data-i18n="allBirthdays">All birthdays</a></nav>
+    <div class="header-actions"><label class="language-control"><span class="sr-only" data-i18n="language">Language</span><select id="language" aria-label="Language" data-i18n-aria-label="language"><option value="auto" data-i18n="automatic">Browser (automatic)</option><option value="de" lang="de">Deutsch</option><option value="en" lang="en">English</option></select></label>
+    <button class="button button-dark header-subscribe" data-action="subscribe" data-i18n="subscribe">Subscribe</button></div>
   </header>
 
   <main id="overview" class="page">
-    <div class="page-heading"><h1>Geburtstage in der Abteilung</h1></div>
-    <section class="overview-grid" aria-label="Geburtstagsübersicht">
+    <div class="page-heading"><h1 data-i18n="heading">Team birthdays</h1></div>
+    <section class="overview-grid" aria-label="Birthday overview" data-i18n-aria-label="birthdayOverview">
       <article class="hero" aria-labelledby="next-name">
         <img class="hero-bunting" src="/bunting.svg" alt="" aria-hidden="true">
         <img class="hero-confetti" src="/confetti.svg" alt="" aria-hidden="true">
         <div class="hero-copy" aria-live="polite">
-          <p class="eyebrow">Als Nächstes</p>
-          <h2><span id="next-name">Geburtstage</span><span id="next-status">werden geladen.</span></h2>
-          <p id="next-date" class="hero-date">Einen Moment …</p>
+          <p class="eyebrow" data-i18n="next">Up next</p>
+          <h2><span id="next-name" data-i18n="loadingName">Birthdays</span><span id="next-status" data-i18n="loadingStatus">are loading.</span></h2>
+          <p id="next-date" class="hero-date" data-i18n="loadingDate">Just a moment …</p>
           <p id="next-peers" class="hero-peers" hidden></p>
-          <div class="hero-countdown"><strong id="next-days">–</strong><span id="next-days-label">Tage bis zum Geburtstag</span></div>
+          <div class="hero-countdown"><strong id="next-days">–</strong><span id="next-days-label" data-i18n="days">Days until the birthday</span></div>
         </div>
         <img class="hero-cake" src="/cake.svg" alt="" aria-hidden="true">
       </article>
       <section class="year-panel" aria-labelledby="year-title">
-        <h2 id="year-title" class="eyebrow">Das Jahr im Blick</h2>
-        <div id="month-grid" class="month-grid" role="group" aria-label="Mitarbeiter nach Geburtstagsmonat filtern"></div>
-        <p id="year-summary" class="year-summary" aria-live="polite">Die Geburtstage werden geladen …</p>
-        <p class="year-hint">Monat auswählen, um die Mitarbeiterliste zu filtern.</p>
+        <h2 id="year-title" class="eyebrow" data-i18n="yearTitle">The year at a glance</h2>
+        <div id="month-grid" class="month-grid" role="group" aria-label="Filter employees by birthday month" data-i18n-aria-label="monthGrid"></div>
+        <p id="year-summary" class="year-summary" aria-live="polite" data-i18n="loadingBirthdays">Loading birthdays …</p>
+        <p class="year-hint" data-i18n="yearHint">Select a month to filter the employee list.</p>
       </section>
     </section>
 
     <div class="content-grid">
       <section id="birthdays" class="birthdays-section" aria-labelledby="birthdays-title">
-        <div class="directory-heading"><h2 id="birthdays-title">Alle Mitarbeiter</h2><button class="button button-dark" data-action="add" aria-label="Geburtstag hinzufügen"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Hinzufügen</button></div>
-        <label class="search"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><input id="search" type="search" placeholder="Nach Namen suchen …" aria-label="Mitarbeiter nach Namen suchen" maxlength="120"></label>
-        <div class="directory-controls"><div class="month-tabs" role="group" aria-label="Monatsfilter"><button class="month-tab selected" data-month="all" aria-pressed="true">Alle Monate</button><button class="month-tab" data-month="current" aria-pressed="false">Diesen Monat</button></div><span id="directory-count" class="directory-count">0 Mitarbeiter</span></div>
-        <div id="directory" class="directory" aria-live="polite"><p class="loading-message">Die Mitarbeiter werden geladen …</p></div>
+        <div class="directory-heading"><h2 id="birthdays-title" data-i18n="employees">All employees</h2><button class="button button-dark" data-action="add" aria-label="Add birthday" data-i18n-aria-label="addBirthday"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span data-i18n="add">Add</span></button></div>
+        <label class="search"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><input id="search" type="search" placeholder="Search by name …" data-i18n-placeholder="searchPlaceholder" aria-label="Search employees by name" data-i18n-aria-label="searchLabel" maxlength="120"></label>
+        <div class="directory-controls"><div class="month-tabs" role="group" aria-label="Month filter" data-i18n-aria-label="monthFilter"><button class="month-tab selected" data-month="all" aria-pressed="true" data-i18n="allMonths">All months</button><button class="month-tab" data-month="current" aria-pressed="false" data-i18n="currentMonth">This month</button></div><span id="directory-count" class="directory-count">0 employees</span></div>
+        <div id="directory" class="directory" aria-live="polite"><p class="loading-message" data-i18n="loadingEmployees">Loading employees …</p></div>
       </section>
       <aside class="subscription-sidebar" aria-labelledby="sidebar-title">
-        <h2 id="sidebar-title">Geburtstage abonnieren</h2>
-        <p>Ein Abo für alle eingetragenen Mitarbeiter. Neue Einträge erscheinen automatisch.</p>
-        <button class="subscription-link subscription-link-dark" data-action="subscribe" data-channel="calendar"><span>Kalender abonnieren</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-        <button class="subscription-link" data-action="subscribe" data-channel="teams"><span>Teams-Webhook</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
-        <p id="teams-sidebar-status" class="sidebar-status">Teams-Status wird geladen …</p>
+        <h2 id="sidebar-title" data-i18n="subscribeTitle">Subscribe to birthdays</h2>
+        <p data-i18n="sidebarIntro">One subscription for all employees. New entries appear automatically.</p>
+        <button class="subscription-link subscription-link-dark" data-action="subscribe" data-channel="calendar"><span data-i18n="subscribeCalendar">Subscribe to calendar</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        <button class="subscription-link" data-action="subscribe" data-channel="teams"><span data-i18n="teamsWebhook">Teams webhook</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        <p id="teams-sidebar-status" class="sidebar-status" data-i18n="loadingTeams">Loading Teams status …</p>
       </aside>
     </div>
-    <div id="load-error" class="load-error" role="alert" hidden><p>Die Geburtstage konnten nicht geladen werden.</p><button class="button button-outline" data-action="reload">Erneut versuchen</button></div>
+    <div id="load-error" class="load-error" role="alert" hidden><p data-i18n="loadError">Birthdays could not be loaded.</p><button class="button button-outline" data-action="reload" data-i18n="retry">Try again</button></div>
   </main>
-  <footer class="site-footer"><span>Hipphipphurra · Interner Geburtstagskalender</span><span>Kalender · Teams</span></footer>
+  <footer class="site-footer"><span data-i18n="footer">Hipphipphurra · Internal birthday calendar</span><span data-i18n="footerChannels">Calendar · Teams</span></footer>
 
-  <dialog id="person-dialog" class="modal" aria-labelledby="person-title"><form id="person-form"><div class="modal-head"><span class="modal-icon lavender"><svg class="icon"><use href="#i-cake"/></svg></span><button type="button" class="icon-button" data-close aria-label="Dialog schließen"><svg class="icon"><use href="#i-close"/></svg></button></div><div class="eyebrow">MITARBEITER</div><h2 id="person-title">Geburtstag hinzufügen</h2><p class="modal-intro">Name und Datum eintragen. Das Geburtsjahr ist optional.</p><input type="hidden" id="person-id"><label class="field">Name<input id="person-name" name="name" placeholder="Zum Beispiel: Alex Müller" maxlength="120" required autocomplete="name"></label><div class="date-fields"><label class="field">Tag<input id="person-day" name="day" type="number" min="1" max="31" placeholder="TT" required inputmode="numeric"></label><label class="field">Monat<select id="person-month" name="month" required><option value="">Monat wählen</option></select></label><label class="field">Jahr <span>optional</span><input id="person-year" name="year" type="number" min="1900" placeholder="JJJJ" inputmode="numeric"></label></div><p class="field-note">Mit Geburtsjahr wird das Alter angezeigt.</p><p id="person-error" class="form-error" role="alert" hidden></p><div class="modal-actions"><button type="button" class="button button-outline" data-close>Abbrechen</button><button type="submit" class="button button-dark"><svg class="icon"><use href="#i-check"/></svg>Geburtstag speichern</button></div></form></dialog>
+  <dialog id="person-dialog" class="modal" aria-labelledby="person-title"><form id="person-form" novalidate><div class="modal-head"><span class="modal-icon lavender"><svg class="icon"><use href="#i-cake"/></svg></span><button type="button" class="icon-button" data-close aria-label="Close dialog" data-i18n-aria-label="close"><svg class="icon"><use href="#i-close"/></svg></button></div><div class="eyebrow" data-i18n="employee">Employee</div><h2 id="person-title" data-i18n="addBirthday">Add birthday</h2><p class="modal-intro" data-i18n="personIntro">Enter a name and date. The birth year is optional.</p><input type="hidden" id="person-id"><label class="field"><span data-i18n="name">Name</span><input id="person-name" name="name" placeholder="For example: Alex Smith" data-i18n-placeholder="namePlaceholder" maxlength="120" required autocomplete="name"></label><div class="date-fields"><label class="field"><span data-i18n="day">Day</span><input id="person-day" name="day" type="number" min="1" max="31" placeholder="DD" data-i18n-placeholder="dayPlaceholder" required inputmode="numeric"></label><label class="field"><span data-i18n="month">Month</span><select id="person-month" name="month" required><option value="" data-i18n="chooseMonth">Choose a month</option></select></label><label class="field"><span data-i18n="year">Year</span> <span data-i18n="optional">optional</span><input id="person-year" name="year" type="number" min="1900" placeholder="YYYY" data-i18n-placeholder="yearPlaceholder" inputmode="numeric"></label></div><p class="field-note" data-i18n="ageNote">Add a birth year to display the age.</p><p id="person-error" class="form-error" role="alert" hidden></p><div class="modal-actions"><button type="button" class="button button-outline" data-close data-i18n="cancel">Cancel</button><button type="submit" class="button button-dark"><svg class="icon"><use href="#i-check"/></svg><span data-i18n="saveBirthday">Save birthday</span></button></div></form></dialog>
 
-  <dialog id="subscribe-dialog" class="modal subscribe-modal" aria-labelledby="subscribe-title"><div class="modal-head"><span class="modal-icon butter"><svg class="icon"><use href="#i-bell"/></svg></span><button type="button" class="icon-button" data-close aria-label="Dialog schließen"><svg class="icon"><use href="#i-close"/></svg></button></div><div class="eyebrow">ERINNERUNGEN</div><h2 id="subscribe-title">Geburtstage abonnieren</h2><p class="modal-intro">Alle Abos umfassen sämtliche eingetragenen Mitarbeiter.</p><section id="calendar-option" class="subscription-option" tabindex="-1"><div class="option-title"><svg class="icon"><use href="#i-calendar"/></svg><h3>Im Kalender</h3><span class="availability">Verfügbar</span></div><p>Geburtstage als ganztägige Termine. Den Link in deinem Kalender als Kalenderabo hinzufügen.</p><div class="copy-field"><input id="calendar-url" readonly aria-label="Kalender-Abonnement-URL"><button class="button button-outline" id="copy-calendar"><svg class="icon"><use href="#i-copy"/></svg>Kopieren</button></div><details><summary>Wie funktioniert das?</summary><p>In Outlook: „Kalender hinzufügen“ → „Aus dem Internet abonnieren“. In Apple Kalender: „Ablage“ → „Neues Kalenderabonnement“. Den Link einfügen und abonnieren.</p><p>Dein Kalender bestimmt Aktualisierung und Erinnerungen. Die abrufende Kalenderanwendung muss die interne Adresse erreichen können; ein Abruf durch Microsoft oder Google aus der Cloud kann deshalb scheitern.</p><a class="text-link" href="/calendar.ics" download="hipphipphurra.ics">Stattdessen einmalig als ICS herunterladen<svg class="icon"><use href="#i-arrow"/></svg></a><p>Ein Download ist eine Momentaufnahme und aktualisiert sich nicht automatisch.</p></details></section><section id="teams-option" class="subscription-option" tabindex="-1"><div class="option-title"><svg class="icon"><use href="#i-users"/></svg><h3>In Microsoft Teams</h3><span id="teams-status" class="availability">Wird geladen</span></div><p id="teams-description">Eine Nachricht im Teams-Kanal um 08:00 Uhr, wenn jemand Geburtstag hat.</p><p id="teams-hint" class="setup-hint" hidden>Einmalig einen Teams-Workflow „Webhookwarnungen an einen Kanal senden“ anlegen und dessen URL in der Serverkonfiguration hinterlegen. Danach kommen die Nachrichten für alle im Kanal automatisch.</p></section><p class="timezone-note">Alle Versandzeiten gelten für Europe/Berlin.</p></dialog>
+  <dialog id="subscribe-dialog" class="modal subscribe-modal" aria-labelledby="subscribe-title"><div class="modal-head"><span class="modal-icon butter"><svg class="icon"><use href="#i-bell"/></svg></span><button type="button" class="icon-button" data-close aria-label="Close dialog" data-i18n-aria-label="close"><svg class="icon"><use href="#i-close"/></svg></button></div><div class="eyebrow" data-i18n="reminders">Reminders</div><h2 id="subscribe-title" data-i18n="subscribeTitle">Subscribe to birthdays</h2><p class="modal-intro" data-i18n="subscriptionIntro">Every subscription includes all employees in the directory.</p><section id="calendar-option" class="subscription-option" tabindex="-1"><div class="option-title"><svg class="icon"><use href="#i-calendar"/></svg><h3 data-i18n="inCalendar">In your calendar</h3><span class="availability" data-i18n="available">Available</span></div><p data-i18n="calendarIntro">Birthdays appear as all-day events. Add this link as a calendar subscription in your calendar app.</p><div class="copy-field"><input id="calendar-url" readonly aria-label="Calendar subscription URL" data-i18n-aria-label="calendarUrl"><button class="button button-outline" id="copy-calendar"><svg class="icon"><use href="#i-copy"/></svg><span data-i18n="copy">Copy</span></button></div><details><summary data-i18n="howItWorks">How does it work?</summary><p data-i18n="calendarInstructions">In Outlook: “Add calendar” → “Subscribe from web”. In Apple Calendar: “File” → “New Calendar Subscription”. Paste the link and subscribe.</p><p data-i18n="calendarLimitations">Your calendar app controls updates and reminders. It must be able to reach the internal address; cloud services from Microsoft or Google may not be able to access it.</p><a id="download-calendar" class="text-link" href="/calendar.ics?lang=en" download="hipphipphurra.ics"><span data-i18n="downloadCalendar">Download a one-off ICS file instead</span><svg class="icon"><use href="#i-arrow"/></svg></a><p data-i18n="snapshot">A download is a snapshot and does not update automatically.</p></details></section><section id="teams-option" class="subscription-option" tabindex="-1"><div class="option-title"><svg class="icon"><use href="#i-users"/></svg><h3 data-i18n="inTeams">In Microsoft Teams</h3><span id="teams-status" class="availability" data-i18n="loading">Loading</span></div><p id="teams-description" data-i18n="teamsDescription">A message in your Teams channel at 08:00 when someone has a birthday.</p><p id="teams-hint" class="setup-hint" hidden data-i18n="teamsHint">Create a Teams workflow using “Send webhook alerts to a channel” and add its URL to the server configuration. Birthday messages will then be sent to everyone in the channel automatically.</p></section><p class="timezone-note" data-i18n="timeZone">All delivery times use Europe/Berlin.</p></dialog>
 
-  <dialog id="delete-dialog" class="modal small-modal" aria-labelledby="delete-title"><div class="modal-head"><span class="modal-icon peach"><svg class="icon"><use href="#i-trash"/></svg></span><button type="button" class="icon-button" data-close aria-label="Dialog schließen"><svg class="icon"><use href="#i-close"/></svg></button></div><h2 id="delete-title">Eintrag entfernen?</h2><p id="delete-text" class="modal-intro"></p><p id="delete-error" class="form-error" role="alert" hidden></p><div class="modal-actions"><button class="button button-outline" data-close>Behalten</button><button id="confirm-delete" class="button button-danger">Eintrag löschen</button></div></dialog>
+  <dialog id="delete-dialog" class="modal small-modal" aria-labelledby="delete-title"><div class="modal-head"><span class="modal-icon peach"><svg class="icon"><use href="#i-trash"/></svg></span><button type="button" class="icon-button" data-close aria-label="Close dialog" data-i18n-aria-label="close"><svg class="icon"><use href="#i-close"/></svg></button></div><h2 id="delete-title" data-i18n="deleteTitle">Remove entry?</h2><p id="delete-text" class="modal-intro"></p><p id="delete-error" class="form-error" role="alert" hidden></p><div class="modal-actions"><button class="button button-outline" data-close data-i18n="keep">Keep entry</button><button id="confirm-delete" class="button button-danger" data-i18n="deleteEntry">Delete entry</button></div></dialog>
 
   <div id="toast" class="toast" role="status" hidden></div>
 </body>
