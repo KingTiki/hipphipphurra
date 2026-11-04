@@ -1,33 +1,27 @@
 # Sicherheit
 
-## Vorgesehener Betrieb
+## Unterstützte Versionen
 
-Hipphipphurra ist eine Anwendung für ein vertrauenswürdiges internes Netz.
-Es gibt keine Anmeldung oder Rollen: Jeder mit Zugriff kann Mitarbeiterdaten
-lesen, ändern und löschen. Auch der Kalenderfeed ist ohne Anmeldung lesbar.
-Die Anwendung deshalb nur intern oder hinter einer vorgeschalteten
-Zugriffskontrolle betreiben. HTTPS kann ein Reverse Proxy übernehmen.
-
-Die Origin- und Header-Prüfung der JSON-Endpunkte dient dem Schutz vor fremden
-Browser-Anfragen; sie ist keine Benutzer-Authentifizierung.
-
-Die Teams-Webhook-URL ist ein Geheimnis. Lokal in `.env` bzw. in der
-Deployment-Konfiguration speichern, niemals in Issues, Screenshots, Logs oder
-Quellcode veröffentlichen. Bei Veröffentlichung die URL im Teams-Workflow
-ersetzen. Das Entfernen einer Datei aus dem aktuellen Git-Stand entfernt sie
-nicht aus bereits veröffentlichten Commits.
-
-Für eine Veröffentlichung des Quellcodes werden keine echten Mitarbeiterdaten
-benötigt. Der lokale Datenordner und alle Datenbanksicherungen bleiben privat.
-Betreiber sind für Zugriffsrechte, Datensicherung und den Umgang mit den
-gespeicherten Mitarbeiterdaten verantwortlich.
+Unterstützt wird das jeweils neueste stabile Release. Sicherheitskorrekturen
+werden als neues Release veröffentlicht; ältere Versionen erhalten keine
+separaten Sicherheitsupdates. Vorabversionen sind für Tests vorgesehen.
 
 ## Schwachstellen melden
 
-Falls im GitHub-Repository private Sicherheitsmeldungen aktiviert sind, bitte
-**Security → Report a vulnerability** verwenden. Andernfalls zunächst ein Issue
-mit der Bitte um einen privaten Meldeweg öffnen, ohne Zugangsdaten, personenbezogene
-Daten oder ausnutzbare technische Details offenzulegen.
+Sicherheitslücken bitte im GitHub-Repository über **Security → Report a vulnerability**
+privat melden. Die Meldung sollte die betroffene Version, eine Beschreibung und
+Schritte zur Reproduktion mit fiktiven Daten enthalten.
 
-Sicherheitskorrekturen werden für den aktuellen Stand des Standardbranches
-bereitgestellt. Separate ältere Release-Zweige werden derzeit nicht gepflegt.
+Falls diese Funktion im Repository nicht verfügbar ist, steht derzeit kein
+privater Meldeweg bereit. Bitte keine vertraulichen Details, Zugangsdaten oder
+personenbezogenen Daten in öffentlichen Issues veröffentlichen.
+
+## Zugriffsmodell
+
+Hipphipphurra hat keine Anmeldung oder Rollen. Jeder, der die Anwendung erreicht,
+kann alle Mitarbeiterdaten lesen, ändern und löschen. Auch der Kalenderfeed ist
+ohne Anmeldung abrufbar. Origin- und Header-Prüfungen ersetzen keine Anmeldung.
+
+Den Zugriff deshalb auf den vorgesehenen Personenkreis begrenzen, etwa über
+Netzwerkregeln oder eine vorgeschaltete Anmeldung. Hinweise zum Betrieb und zum
+Umgang mit Geheimnissen stehen in der [README](README.md#sicherer-betrieb).

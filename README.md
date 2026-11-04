@@ -36,6 +36,23 @@ Aufrufen unter **http://localhost:3000**. Die Daten liegen dauerhaft in `./data`
 Für Zugriff im internen Netz `BIND_ADDRESS=0.0.0.0` und die erreichbare
 Serveradresse als `BASE_URL` setzen. Das fertige Image unterstützt Linux/amd64.
 
+## Sicherer Betrieb
+
+Alle Personen mit Zugriff auf die Anwendung können sämtliche Einträge lesen,
+ändern und löschen. Den Zugriff über Netzwerkregeln oder eine vorgeschaltete
+Anmeldung auf den vorgesehenen Personenkreis begrenzen. Für HTTPS einen Reverse
+Proxy verwenden.
+
+Die Teams-Webhook-URL vertraulich in `.env` oder der Deployment-Konfiguration
+speichern. Wurde sie offengelegt, die URL im Teams-Workflow ersetzen und die
+Konfiguration aktualisieren. Das Löschen aus einer Datei entfernt sie nicht aus
+bereits veröffentlichten Git-Commits.
+
+Echte Mitarbeiterdaten, den Datenordner und Sicherungen nicht ins Repository
+hochladen. Hinweise zu Updates und Datensicherung stehen in
+[CONTRIBUTING.md](CONTRIBUTING.md#updates-und-sicherung), Versionssupport und
+Meldeweg für Sicherheitslücken in [SECURITY.md](SECURITY.md).
+
 ## Lizenzen
 
 - Projektcode und Grafiken: [MIT](LICENSE).
